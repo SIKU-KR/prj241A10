@@ -18,7 +18,7 @@ public class BusManager {
     }
 	
 	public BusManager(String arrival, int type){
-
+        System.out.println("test");
     }
 
 
