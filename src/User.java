@@ -1,5 +1,3 @@
-import buses.Bus;
-
 import java.util.ArrayList;
 
 public class User {
