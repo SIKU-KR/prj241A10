@@ -17,9 +17,11 @@ public class BusManager {
         getBusFromFileSystem();
     }
 	
-	// Getter, Setter
-	
-	
+	public BusManager(String arrival, int type){
+        System.out.println("test");
+    }
+
+
 	// 메소드
     // 버스 객체 텍스트 파일 추가 메소드
     public void addBus(String departure, String arrival, String date, String time, int price){
