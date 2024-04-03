@@ -1,8 +1,12 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
+
 public class Bus {
 	// 멤버 변수
 	private String departure;	// 출발지
     private String arrival;	// 도착지
-    private String date;	// 출발일
+    private LocalDate date;	// 출발일
     private String time;	// 출발시각
     private int price;	// 가격
     private String seats;	// 좌석
@@ -11,16 +15,48 @@ public class Bus {
     public Bus(String departure, String arrival, String date, String time, int price, String seats) {
         this.departure = departure.strip();
         this.arrival = arrival.strip();
-        this.date = date;
         this.time = time.strip();
         this.price = price;
         this.seats = seats.strip();
+        try{
+            String[] dateArray = date.split("-");
+            this.date = LocalDate.of(Integer.parseInt(dateArray[0]), Integer.parseInt(dateArray[1]), Integer.parseInt(dateArray[2]));
+        } catch(Exception e) {
+            System.err.println("Wrong date parameter");
+        }
     }
-	
-	// Getter, Setter
-	
-	
-	// 메소드
+
+    // isEqual 메소드 오버라이드
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Bus bus = (Bus) obj;
+        return departure.equals(bus.departure) && arrival.equals(bus.arrival) && date.equals(bus.date) && time.equals(bus.time);
+    }
+
+    // hashCode 메소드 오버라이드
+    @Override
+    public int hashCode() {
+        return Objects.hash(departure, arrival, date, time);
+    }
+
+    // toString 메소드 오버라이드
+    @Override
+    public String toString() {
+        return this.departure + " " + this.arrival + " " + this.getFormattedDate() + " " + this.time;
+    }
+
+    // "yyyy-mm-dd" formatted data 문자열 반환
+    private String getFormattedDate() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return this.date.format(formatter);
+    }
+
     // 좌석 배열 출력 메소드
     private String getFormattedSeats() {
         StringBuilder ret = new StringBuilder();
@@ -58,7 +94,7 @@ public class Bus {
         String ret;
         ret = "출발지: " + this.departure + "\n";
         ret += "도착지: " + this.arrival + "\n";
-        ret += "일자: " + this.date + "\n";
+        ret += "일자: " + this.getFormattedDate() + "\n";
         ret += "시간: " + this.time + "\n";
         ret += "가격: " + this.price + "원\n";
         ret += "좌석현황:\n";
@@ -66,9 +102,12 @@ public class Bus {
         return ret;
     }
 
-    // 상품 정보 문자열 출력 오버라이딩
-    @Override
-    public String toString() {
-        return this.departure + " " + this.arrival + " " + this.date + " " + time;
+    public boolean checkFilter(String arrival, String departure, LocalDate date){
+        return (this.arrival.equals(arrival)) && (this.departure.equals(departure)) && (this.date.equals(date));
+    }
+
+    public boolean isWithinOneYear(LocalDate programDate) {
+        LocalDate oneYearAfterProgramDate = programDate.plusYears(1);
+        return !this.date.isBefore(programDate) && this.date.isBefore(oneYearAfterProgramDate);
     }
 }
