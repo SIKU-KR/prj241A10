@@ -67,6 +67,16 @@ public class BusManager {
         }
     }
 
+    // returns true if busArrayList has Duplicates
+    public boolean hasDuplicates(Bus target){
+        for(Bus b: busArrayList){
+            if(b.equals(target)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     // 버스 객체 텍스트 파일 추가 메소드
     public void addBus(String departure, String arrival, String date, String time, int price){
         String filename = departure + " " + arrival + " " + date + " " + time + ".txt";
