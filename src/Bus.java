@@ -110,4 +110,8 @@ public class Bus {
         LocalDate oneYearAfterProgramDate = programDate.plusYears(1);
         return !this.date.isBefore(programDate) && this.date.isBefore(oneYearAfterProgramDate);
     }
+
+    public String getBusContentForUserFile(int userSeat){
+        return this.date + " / " + this.departure + " / " + this.arrival + " / 출발시간 : " + this.time + " / 보유좌석 : " + userSeat + "번 / 가격 : " + this.price + "원";
+    }
 }
