@@ -1,14 +1,15 @@
+import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Bus {
 	// 멤버 변수
-	private String departure;	// 출발지
-    private String arrival;	// 도착지
+	private final String departure;	// 출발지
+    private final String arrival;	// 도착지
     private LocalDate date;	// 출발일
-    private String time;	// 출발시각
-    private int price;	// 가격
+    private final String time;	// 출발시각
+    private final int price;	// 가격
     private String seats;	// 좌석
 		
 	// 생성자
@@ -114,4 +115,59 @@ public class Bus {
     public String getBusContentForUserFile(int userSeat){
         return this.date + " / " + this.departure + " / " + this.arrival + " / 출발시간 : " + this.time + " / 보유좌석 : " + userSeat + "번 / 가격 : " + this.price + "원";
     }
+
+    public boolean buySeat(int seatnum) {
+        String directory = "bus";
+        File file = new File(directory + "/" + this + ".txt");
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(directory + "/" + this + ".txt"));
+            String[] line = reader.readLine().strip().split(",");
+            String[] seats = line[1].split(" ");
+            seats[seatnum + 1] = "1";
+
+            StringBuilder seatsString = new StringBuilder();
+            for (String seat : seats) {
+                seatsString.append(seat).append(" "); // 좌석 정보를 문자열에 추가하고 띄어쓰기를 붙입니다.
+            }
+            this.seats = seatsString.toString().trim();
+            // 파일을 쓰기 모드로 열어서 수정된 내용을 다시 씁니다.
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(line[0] + ","); // 버스 번호를 쓰고 쉼표를 붙입니다.
+            writer.write(this.seats); // 좌석 정보 문자열을 쓰고 공백을 제거하여 붙입니다.
+            writer.close(); // 파일을 닫습니다.
+
+        } catch (IOException e) {
+            System.err.println("존재하지 않는 버스입니다.");
+            return false;
+        }
+        return true;
+    }
+
+    public boolean returnSeat(int seatnum) {
+        String directory = "bus";
+        File file = new File(directory + "/" + this + ".txt");
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(directory + "/" + this + ".txt"));
+            String[] line = reader.readLine().strip().split(",");
+            String[] seats = line[1].split(" ");
+            seats[seatnum + 1] = "0";
+
+            StringBuilder seatsString = new StringBuilder();
+            for (String seat : seats) {
+                seatsString.append(seat).append(" "); // 좌석 정보를 문자열에 추가하고 띄어쓰기를 붙입니다.
+            }
+            this.seats = seatsString.toString().trim();
+            // 파일을 쓰기 모드로 열어서 수정된 내용을 다시 씁니다.
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(line[0] + ","); // 버스 번호를 쓰고 쉼표를 붙입니다.
+            writer.write(this.seats); // 좌석 정보 문자열을 쓰고 공백을 제거하여 붙입니다.
+            writer.close(); // 파일을 닫습니다.
+
+        } catch (IOException e) {
+            System.err.println("존재하지 않는 버스입니다.");
+            return false;
+        }
+        return true;
+    }
+
 }

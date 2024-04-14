@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.rmi.ServerError;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -43,6 +44,8 @@ public class BusManager {
                     System.err.println("운행 상품 읽기를 실패했습니다.");
                 } catch (NumberFormatException e) {
                     System.err.println("운행 상품의 내용에서 예외가 발생했습니다.");
+                } catch (NullPointerException e) {
+                    System.err.println("운행 상품을 읽는 중 예외가 발생했습니다.");
                 }
             }
         }
