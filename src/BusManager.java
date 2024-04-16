@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.rmi.ServerError;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -50,11 +49,11 @@ public class BusManager {
             }
         }
         // 날짜 필터링 로직 추가
-        this.busArrayList.removeIf(item -> item.isWithinOneYear(this.programDate));
+        this.busArrayList.removeIf(item -> !item.isWithinOneYear(this.programDate));
     }
 
-    private void filterBy(String arrival, String departure, LocalDate date){
-        this.busArrayList.removeIf(item -> !item.checkFilter(arrival, departure, date));
+    private void filterBy(String departure, String arrival, LocalDate date){
+        this.busArrayList.removeIf(item -> !item.checkFilter(departure, arrival, date));
     }
 
     public boolean isBusListEmpty(){

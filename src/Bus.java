@@ -27,6 +27,14 @@ public class Bus {
         }
     }
 
+    public Bus(String departure, String arrival, LocalDate date, String time, int price) {
+        this.departure = departure;
+        this.arrival = arrival;
+        this.date = date;
+        this.time = time;
+        this.price = price;
+    }
+
     // isEqual 메소드 오버라이드
     @Override
     public boolean equals(Object obj) {
@@ -103,14 +111,15 @@ public class Bus {
         return ret;
     }
 
-    public boolean checkFilter(String arrival, String departure, LocalDate date){
-        return (this.arrival.equals(arrival)) && (this.departure.equals(departure)) && (this.date.equals(date));
+    public boolean checkFilter(String departure, String arrival, LocalDate date){
+        return (this.arrival.equals(arrival)) && (this.departure.equals(departure)) && (this.date.isEqual(date));
     }
 
     public boolean isWithinOneYear(LocalDate programDate) {
         LocalDate oneYearAfterProgramDate = programDate.plusYears(1);
-        return !this.date.isBefore(programDate) && this.date.isBefore(oneYearAfterProgramDate);
+        return (this.date.isEqual(programDate) || this.date.isAfter(programDate)) && this.date.isBefore(oneYearAfterProgramDate);
     }
+
 
     public String getBusContentForUserFile(int userSeat){
         return this.date + " / " + this.departure + " / " + this.arrival + " / 출발시간 : " + this.time + " / 보유좌석 : " + userSeat + "번 / 가격 : " + this.price + "원";
