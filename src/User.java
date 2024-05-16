@@ -1,6 +1,5 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class User {
@@ -42,6 +41,10 @@ public class User {
 
 	public ArrayList<Integer> getUserSeatArrayList() {return userSeatArrayList;}
 
+	public void removeBus(int busNo) {
+		busArrayList.remove(busNo-1);
+		userSeatArrayList.remove(busNo-1);
+	}
 	public void setUserAccount(int userAccount) {
 		this.userAccount = userAccount;
 	}
@@ -49,7 +52,8 @@ public class User {
 
 	// 메소드
 	public User loadUserFromFile(String fileName) {
-		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+		//try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), StandardCharsets.UTF_8))) {
 			String line = br.readLine();
 			String[] userInfo = line.split(" ");
 			String userID = userInfo[0]; // 사용자 아이디
@@ -74,13 +78,15 @@ public class User {
 					String userSeatStr = busInfo[4].trim();
 					String priceStr = busInfo[5].trim();
 					time = time.replace("출발시간 : ", "");
+					time = time.replace(":","∶");
 					userSeatStr = userSeatStr.replace("보유좌석 : ", "");
 					userSeatStr = userSeatStr.replace("번", "");
 					int userSeat = Integer.parseInt(userSeatStr);
 					userSeatArrayList.add(userSeat);
 					int price = Integer.parseInt(priceStr.replace("가격 : ", "").replace("원", ""));
 					String seats;
-					BufferedReader busReader = new BufferedReader((new FileReader("bus/" + departure + " " + arrival + " " + date + " " + time + ".txt")));
+					//BufferedReader busReader = new BufferedReader((new FileReader("bus/" + departure + " " + arrival + " " + date + " " + time + ".txt")));
+					BufferedReader busReader = new BufferedReader(new InputStreamReader(new FileInputStream("bus/" + departure + " " + arrival + " " + date + " " + time + ".txt"), StandardCharsets.UTF_8));
 					seats = busReader.readLine().split(",")[1];
 					busArrayList.add(new Bus(departure, arrival, date, time, price, seats));
 				} else {

@@ -1,19 +1,21 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Admin {
+	public boolean logout_admin = false;
 	// 멤버 변수
-	private final LocalDate programDate = LocalDate.of(2024,1,1);
+	private LocalDate programDate;
 	private ArrayList<String> cityDic;	// 지역 사전 리스트
-
+	final String red = "\u001B[31m" ;
+	final String exit = "\u001B[0m" ;
 	public static Scanner scan = new Scanner(System.in);
 
 	// 생성자
@@ -25,38 +27,29 @@ public class Admin {
 	// 메소드
 	// 기능 실행 메소드
 	public void initAdmin() {
-		int selected = 0;	// 입력 메뉴
-
-		while (true) {	// 사용자 메뉴 입력 확인
-			try {
-				System.out.println("-".repeat(50));
-				System.out.println("1. 상품 등록");
-				System.out.println("2. 상품 조회");
-				System.out.println("3. 로그아웃");
-				System.out.print("메뉴를 입력하세요: ");
-				selected = scan.nextInt();
-
-				if(selected >= 1 && selected <= 3) {
-					break;
-				} else {
-					System.out.println("1 ~ 3 사이의 숫자 중 하나만 입력해주세요.");
-				}
-			} catch (InputMismatchException e) {
-				Error error = new Error();
-				error.printRegularExpressionError();
-				scan.next(); // 잘못된 입력을 지우기
+		String selected;	// 사용자 입력 메뉴
+		while(true) {
+			System.out.println("-".repeat(50));
+			System.out.println("1. 상품 등록");
+			System.out.println("2. 상품 조회");
+			System.out.println("3. 로그아웃");
+			System.out.print("메뉴를 입력하세요: ");
+			selected = scan.nextLine();
+			if(selected.equals("1") || selected.equals("2") || selected.equals("3")) {
+				break;
+			} else {
+				System.out.println(red+"올바르지 않은 입력형식입니다. 다시 입력해주세요."+exit);
 			}
 		}
-
 		switch (selected) {
-			case 1:
+			case "1":
 				registerBus();
 				break;
-			case 2:
+			case "2":
 				findBus();
 				break;
 			default:
-//				logout();
+				logout();
 				break;
 		}
 	}
@@ -64,16 +57,18 @@ public class Admin {
 	// 텍스트 파일을 읽어 와 지역 사전 리스트 초기화 하는 메소드
 	private void readCityDic() {
 		try {
-			Scanner file = new Scanner(new File("cityDictionary.txt"));
+			Scanner file = new Scanner(new File("cityDictionary.txt"), StandardCharsets.UTF_8);
 			while(file.hasNext()) {
 				String word = file.next();
 				this.cityDic.add(word);
 			}
 			file.close();
 		} catch (FileNotFoundException e) {
-			System.err.println("파일을 찾을 수 없습니다.");
-		}
-	}
+			System.out.println(red+"파일을 찾을 수 없습니다."+exit);
+		} catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 	// 1. 상품 등록 관련 메소드
 	private void registerBus() {
@@ -87,7 +82,6 @@ public class Admin {
 
 		System.out.println("-".repeat(50));
 		System.out.println("출발지와 도착지로 가능한 지역은 " + printCityDic() + "입니다.");
-		scan.nextLine();
 		// 출발지와 도착지 입력
 		boolean cityFlag = false;	// 지역사전 플래그
 		do {
@@ -129,18 +123,17 @@ public class Admin {
 			priceFlag = checkPrice(sPrice);
 		} while (!priceFlag);
 		price = Integer.parseInt(sPrice);
-		// 상품 중복 테스트 코드 작성하기
+
 		LocalDate local = LocalDate.parse(departureDayStr);
 		BusManager bm = new BusManager(departure, arrival, local);
-		// 버스 중복 어떻게 판단함?
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // 날짜 형식 지정
 		LocalDate date = LocalDate.parse(departureDayStr, formatter);
-		if(bm.hasDuplicates(new Bus(departure, arrival, date, departureTimeStr, price))) {
-			System.out.println("중복으로 등록된 상품이 있습니다. 메인화면으로 돌아갑니다.");
-			initAdmin();
+		if(bm.hasDuplicates(new Bus(departure, arrival, date, departureTimeStr.replace(":","∶"), price))) {
+			System.out.println(red+"중복으로 등록된 상품이 있습니다. 메인화면으로 돌아갑니다."+exit);
 		} else {
-			bm.addBus(departure, arrival, departureDayStr, departureTimeStr, price);
+			bm.addBus(departure, arrival, departureDayStr, departureTimeStr.replace(":","∶"), price);
 		}
+		initAdmin();
 	}
 
 	// 지역 사전 출력 메소드
@@ -159,7 +152,7 @@ public class Admin {
 			if(city.equals(cityDic.get(i)))
 				return true;
 		}
-		System.out.println("지역 사전에 저장되어있지 않은 지역을 입력하였습니다. 다시 입력해주세요.");
+		System.out.println(red+"지역 사전에 저장되어있지 않은 지역을 입력하였습니다. 다시 입력해주세요."+exit);
 		return false;
 	}
 
@@ -168,7 +161,7 @@ public class Admin {
 		String re = "^(?:(?:20[0-2]\\d)-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01]))$";
 		if(dayStr.matches(re))
 			return true;
-		System.out.println("올바르지 않은 입력형식입니다. 다시 입력해주세요.");
+		System.out.println(red+"올바르지 않은 입력형식입니다. 다시 입력해주세요."+exit);
 		return false;
 	}
 
@@ -177,11 +170,11 @@ public class Admin {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			dateFormat.setLenient(false);
 			dateFormat.parse(dayStr);
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(dateFormat.parse(dayStr));
+//			Calendar calendar = Calendar.getInstance();
+//			calendar.setTime(dateFormat.parse(dayStr));
 			return true;
 		} catch (Exception e) {
-			System.out.println("달력에 존재하지 않는 날짜입니다. 다시 입력해주세요.");
+			System.out.println(red+"달력에 존재하지 않는 날짜입니다. 다시 입력해주세요."+exit);
 			return false;
 		}
 	}
@@ -194,15 +187,16 @@ public class Admin {
 			// 문자열을 LocalDate 객체로 파싱
 			LocalDate inputDate = LocalDate.parse(dayStr, formatter);
 
+			this.programDate = LocalDate.of(mainMenuManager.year,mainMenuManager.month,mainMenuManager.day);
 			// 입력된 날짜가 programDate 이후이고, programDate로부터 1년 이내인지 확인
 			if (!inputDate.isBefore(programDate) && !inputDate.isAfter(programDate.plusYears(1))) {
 				return true;
 			} else {
-				System.out.println("입력한 날짜는 프로그램 날짜로부터 1년 이내가 아닙니다.");
+				System.out.println(red+"입력한 날짜는 프로그램 날짜로부터 1년 이내가 아닙니다."+exit);
 				return false;
 			}
 		} catch (DateTimeParseException e) {
-			System.out.println("올바르지 않은 날짜 형식입니다. yyyy-MM-dd 형식으로 입력해주세요.");
+			System.out.println(red+"올바르지 않은 날짜 형식입니다. yyyy-MM-dd 형식으로 입력해주세요."+exit);
 			return false;
 		}
 	}
@@ -212,7 +206,7 @@ public class Admin {
 		String re = "^(?:[01]\\d|2[0-3]):[0-5]\\d$";
 		if(timeStr.matches(re))
 			return true;
-		System.out.println("올바르지 않은 입력입니다. 다시 입력해주세요.");
+		System.out.println(red+"올바르지 않은 입력입니다. 다시 입력해주세요."+exit);
 		return false;
 	}
 
@@ -221,7 +215,7 @@ public class Admin {
 		String re = "^(?:[1-9]\\d{2,4}|100000)$";
 		if(price.matches(re))
 			return true;
-		System.out.println("올바르지 않은 입력형식입니다. 다시 입력해주세요.");
+		System.out.println(red+"올바르지 않은 입력형식입니다. 다시 입력해주세요."+exit);
 		return false;
 	}
 
@@ -234,7 +228,7 @@ public class Admin {
 		// 출발지와 도착지 입력
 		System.out.println("-".repeat(50));
 		System.out.println("출발지와 도착지로 가능한 지역은 " + printCityDic() + "입니다.");
-		scan.nextLine();
+		//scan.nextLine();
 		// 출발지와 도착지 입력
 		boolean cityFlag = false;	// 지역사전 플래그
 		do {
@@ -269,15 +263,44 @@ public class Admin {
 			initAdmin();
 		} else {
 			bm.printBusList();
+			
+			int input = -1;
+			boolean busCountFlag = false;
+			do {
+                System.out.print("상세 조회할 상품 번호를 입력하세요 (관리자 메뉴로 돌아가려면 0을 입력하세요):");
+                try {
+                    String inputStr = scan.nextLine();
+                    input = Integer.parseInt(inputStr);
+                    String inputCheckStr = input+"";
+                    if(inputStr.length() != inputCheckStr.length()){
+                        throw new Exception("선 후행 입력 예외 발생!");
+                    }
+                } catch (Exception e) {
+                    System.out.println(red + "올바르지 않은 입력형식입니다. 다시 입력해주세요." + exit);
+                }
+            } while (!busCountFlag(bm, input));
+			if(input != 0){
+				bm.printBusSpecific(input);
+			}
 			initAdmin();
 		}
 	}
 
-//	// 3. 로그아웃 관련 메소드
-	private void logout() {
-//		MainMenuManager m = new MainMenuManager();
-//		m.showmenu();
+	private boolean busCountFlag(BusManager bm, int input){
+		if(input > bm.getBusCount() || input < 0) {
+			System.out.println(red+"올바르지 않은 입력 범위입니다. 다시 입력해주세요."+exit);
+			return false;
+		} else {
+			return true;
+		}
 	}
 
-
+	// 3. 로그아웃 관련 메소드
+	private void logout() {
+//		mainMenuManager m = new mainMenuManager();
+//		m.showmenu();
+		logout_admin = true;
+	}
 }
+
+

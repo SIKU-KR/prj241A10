@@ -1,20 +1,16 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class BusManager {
-	// 멤버 변수
-	private ArrayList<Bus> busArrayList;	// 버스 목록
-	private final String directory = "bus";	// 디렉토리 이름
-    private final LocalDate programDate = LocalDate.of(2024,1,1);
-	
-	// 생성자, 매개변수 없이 전달되면 모든 파일 불러옴
-	public BusManager() {
+    // 멤버 변수
+    private ArrayList<Bus> busArrayList;	// 버스 목록
+    private final String directory = "bus";	// 디렉토리 이름
+    private LocalDate programDate;
+
+    // 생성자, 매개변수 없이 전달되면 모든 파일 불러옴
+    public BusManager() {
         this.busArrayList = new ArrayList<>();
         getBusFromFileSystem();
     }
@@ -26,7 +22,7 @@ public class BusManager {
         filterBy(departure, arrival, date);
     }
 
-	// 메소드
+    // 메소드
     // 파일에서 버스 읽어 오는 메소드
     private void getBusFromFileSystem(){
         File dir = new File(this.directory + "/");
@@ -49,7 +45,8 @@ public class BusManager {
             }
         }
         // 날짜 필터링 로직 추가
-        this.busArrayList.removeIf(item -> !item.isWithinOneYear(this.programDate));
+        this.programDate = LocalDate.of(mainMenuManager.year,mainMenuManager.month,mainMenuManager.day);
+        //this.busArrayList.removeIf(item -> !item.isWithinOneYear(this.programDate));
     }
 
     private void filterBy(String departure, String arrival, LocalDate date){
@@ -64,7 +61,8 @@ public class BusManager {
     public void printBusList() {
         int idx = 1;
         for (Bus b : this.busArrayList){
-            System.out.println(idx + ". " + b);
+            String b2 = b.toString().replace("∶",":");
+            System.out.println(idx + ". " + b2);
             idx++;
         }
     }
@@ -81,28 +79,27 @@ public class BusManager {
 
     // 버스 객체 텍스트 파일 추가 메소드
     public void addBus(String departure, String arrival, String date, String time, int price){
-        String filename = departure + " " + arrival + " " + date + " " + time + ".txt";
+        String windowTime = time.replace(":","∶");
+        String filename = departure + " " + arrival + " " + date + " " + windowTime + ".txt";
         String newBusSeats = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
         String content = price + "," + newBusSeats;
 
-        // 디렉토리가 존재하지 않으면 생성
-        try {
-            File dir = new File(this.directory);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         // 파일에 내용 작성
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.directory + "/" + filename))) {
+        //try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.directory + "/" + filename))) {
+        try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.directory + "/" + filename), StandardCharsets.UTF_8))) {
             writer.write(content);
             System.out.println("성공적으로 운행 상품이 등록되었습니다.");
         } catch (IOException e) {
             System.err.println("파일 쓰기 오류: " + e.getMessage());
         }
-        this.busArrayList.add(new Bus(departure, arrival, date, time, price, newBusSeats));
+        this.busArrayList.add(new Bus(departure, arrival, date, windowTime, price, newBusSeats));
+    }
+    public int getBusCount(){
+        return this.busArrayList.size();
     }
 
+    public void printBusSpecific(int idx){
+        System.out.println(this.busArrayList.get(idx-1).getDetailInfo());
+    }
 }
