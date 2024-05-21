@@ -74,6 +74,16 @@ public class Bus {
 
     // 좌석 배열 출력 메소드
     public String getFormattedSeats() {
+        String ret = "";
+        switch(this.grade){
+            case PREMIUM -> ret = adminPremiumSeats();
+            case DELUXE -> ret = adminDeluxeSeats();
+            case STANDARD -> ret = adminStandardSeats();
+        }
+        return ret;
+    }
+
+    private String adminPremiumSeats() {
         StringBuilder ret = new StringBuilder();
         String[] seatInfo = this.seats.split(" ");
         if(seatInfo.length != 21){
@@ -103,6 +113,87 @@ public class Bus {
         }
         return ret.toString();
     }
+
+    private String adminDeluxeSeats() {
+        StringBuilder ret = new StringBuilder();
+        String[] seatInfo = this.seats.split(" ");
+        if(seatInfo.length != 28){
+            System.err.println("wrong bus seats information");
+            return null;
+        }
+        for(int i = 0; i < seatInfo.length; i++){
+            if(i >= 24) { // 마지막 4개의 좌석 처리
+                if(seatInfo[i].equals("1")){
+                    ret.append("\u25A0");
+                } else {
+                    ret.append("\u25A1");
+                }
+                if (i != seatInfo.length - 1) {
+                    ret.append(" ");
+                }
+            } else if((i+1) % 3 == 0) {
+                if(seatInfo[i].equals("1")){
+                    ret.append("\u25A0").append("\n");
+                } else {
+                    ret.append("\u25A1").append("\n");
+                }
+            } else if ((i+1) % 3 == 1) {
+                if(seatInfo[i].equals("1")){
+                    ret.append("\u25A0");
+                } else {
+                    ret.append("\u25A1");
+                }
+            } else {
+                if(seatInfo[i].equals("1")){
+                    ret.append("\u25A0 ");
+                } else {
+                    ret.append("\u25A1 ");
+                }
+            }
+        }
+        return ret.toString();
+    }
+
+    private String adminStandardSeats() {
+        StringBuilder ret = new StringBuilder();
+        String[] seatInfo = this.seats.split(" ");
+        if(seatInfo.length != 45){
+            System.err.println("wrong bus seats information");
+            return null;
+        }
+        for(int i = 0; i < seatInfo.length; i++){
+            if(i >= 40) { // 마지막 5개의 좌석 처리
+                if(seatInfo[i].equals("1")){
+                    ret.append("\u25A0");
+                } else {
+                    ret.append("\u25A1");
+                }
+                if (i != seatInfo.length - 1) {
+                    ret.append(" ");
+                }
+            } else if((i+1) % 4 == 0) {
+                if(seatInfo[i].equals("1")){
+                    ret.append("\u25A0").append("\n");
+                } else {
+                    ret.append("\u25A1").append("\n");
+                }
+            } else if ((i+1) % 4 == 1) {
+                if(seatInfo[i].equals("1")){
+                    ret.append("\u25A0");
+                } else {
+                    ret.append("\u25A1");
+                }
+            } else {
+                if(seatInfo[i].equals("1")){
+                    ret.append("\u25A0 ");
+                } else {
+                    ret.append("\u25A1 ");
+                }
+            }
+        }
+        return ret.toString();
+    }
+
 
     // 상세 정보 출력 메소드
     public String getDetailInfo() {
@@ -193,6 +284,16 @@ public class Bus {
     }
 
     private String getFormattedSeats(int userBusNo) {
+        String ret = "";
+        switch(this.grade){
+            case PREMIUM -> userPremiumSeats(userBusNo);
+            case DELUXE -> userDeluxeSeats(userBusNo);
+            case STANDARD -> userStandardSeats(userBusNo);
+        }
+        return ret;
+    }
+
+    private String userPremiumSeats(int userBusNo) {
         StringBuilder ret = new StringBuilder();
 
         for(int i = 0; i < 21; i++){
@@ -218,6 +319,77 @@ public class Bus {
         }
         return ret.toString();
     }
+
+    private String userDeluxeSeats(int userBusNo) {
+        StringBuilder ret = new StringBuilder();
+        for(int i = 0; i < 28; i++){
+            if(i >= 24) { // 마지막 4개의 좌석 처리
+                if(i+1 == userBusNo){
+                    ret.append("\u25A0");
+                } else {
+                    ret.append("\u25A1");
+                }
+                if (i != 27) {
+                    ret.append(" ");
+                }
+            } else if((i+1) % 3 == 0) {
+                if(i+1 == userBusNo){
+                    ret.append("\u25A0").append("\n");
+                } else {
+                    ret.append("\u25A1").append("\n");
+                }
+            } else if ((i+1) % 3 == 1) {
+                if(i+1 == userBusNo){
+                    ret.append("\u25A0");
+                } else {
+                    ret.append("\u25A1");
+                }
+            } else {
+                if(i+1 == userBusNo){
+                    ret.append("\u25A0 ");
+                } else {
+                    ret.append("\u25A1 ");
+                }
+            }
+        }
+        return ret.toString();
+    }
+
+    private String userStandardSeats(int userBusNo) {
+        StringBuilder ret = new StringBuilder();
+        for(int i = 0; i < 45; i++){
+            if(i >= 40) { // 마지막 5개의 좌석 처리
+                if(i+1 == userBusNo){
+                    ret.append("\u25A0");
+                } else {
+                    ret.append("\u25A1");
+                }
+                if (i != 44) {
+                    ret.append(" ");
+                }
+            } else if((i+1) % 4 == 0) {
+                if(i+1 == userBusNo){
+                    ret.append("\u25A0").append("\n");
+                } else {
+                    ret.append("\u25A1").append("\n");
+                }
+            } else if ((i+1) % 4 == 1) {
+                if(i+1 == userBusNo){
+                    ret.append("\u25A0");
+                } else {
+                    ret.append("\u25A1");
+                }
+            } else {
+                if(i+1 == userBusNo){
+                    ret.append("\u25A0 ");
+                } else {
+                    ret.append("\u25A1 ");
+                }
+            }
+        }
+        return ret.toString();
+    }
+
 
     public String getDetailInfo(int userBusNo) {
         String ret;

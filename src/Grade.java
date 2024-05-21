@@ -9,6 +9,15 @@ public enum Grade {
         this.korean = korean;
     }
 
+    public static Grade fromString(String text) {
+        for (Grade grade : Grade.values()) {
+            if (grade.korean.equalsIgnoreCase(text)) {
+                return grade;
+            }
+        }
+        throw new IllegalArgumentException("Unknown grade: " + text);
+    }
+
     @Override
     public String toString() {
         return korean;
