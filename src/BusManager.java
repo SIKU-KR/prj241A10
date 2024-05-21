@@ -3,16 +3,22 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+// TODO !! grade 추가하여서 모든 로직 수정하기!!!!!!!
 public class BusManager {
+    // 2차 추가 구현 변수들
+    private ArrayList<BusPriceInfo> pricelist;
+
     // 멤버 변수
     private ArrayList<Bus> busArrayList;	// 버스 목록
     private final String directory = "bus";	// 디렉토리 이름
-    private LocalDate programDate;
+
 
     // 생성자, 매개변수 없이 전달되면 모든 파일 불러옴
     public BusManager() {
         this.busArrayList = new ArrayList<>();
+        this.pricelist = new ArrayList<>();
         getBusFromFileSystem();
+        readPrice();
     }
 
     // 생성자, 출발지, 도착지, 출발일에 부합하는 파일만 읽어옴
@@ -45,7 +51,7 @@ public class BusManager {
             }
         }
         // 날짜 필터링 로직 추가
-        this.programDate = LocalDate.of(mainMenuManager.year,mainMenuManager.month,mainMenuManager.day);
+        LocalDate programDate = LocalDate.of(mainMenuManager.year, mainMenuManager.month, mainMenuManager.day);
         //this.busArrayList.removeIf(item -> !item.isWithinOneYear(this.programDate));
     }
 
@@ -83,8 +89,6 @@ public class BusManager {
         String filename = departure + " " + arrival + " " + date + " " + windowTime + ".txt";
         String newBusSeats = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
         String content = price + "," + newBusSeats;
-
-
         // 파일에 내용 작성
         //try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.directory + "/" + filename))) {
         try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.directory + "/" + filename), StandardCharsets.UTF_8))) {
@@ -101,5 +105,26 @@ public class BusManager {
 
     public void printBusSpecific(int idx){
         System.out.println(this.busArrayList.get(idx-1).getDetailInfo());
+    }
+
+    private void readPrice() {
+        String filePath = "./pricesheet.csv";
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 5) {
+                    String place1 = parts[0];
+                    String place2 = parts[1];
+                    int price1 = Integer.parseInt(parts[2]);
+                    int price2 = Integer.parseInt(parts[3]);
+                    int price3 = Integer.parseInt(parts[4]);
+                    BusPriceInfo busPriceInfo = new BusPriceInfo(place1, place2, price1, price2, price3);
+                    this.pricelist.add(busPriceInfo);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

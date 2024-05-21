@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+// TODO !! getFormmattedSeats()의 관리자버전, 유저버전을 업데이트 하기.
+
 public class Bus {
     // 멤버 변수
     private final String departure;	// 출발지
@@ -12,13 +14,15 @@ public class Bus {
     private final String time;	// 출발시각
     private final int price;	// 가격
     private String seats;	// 좌석
+    private final Grade grade;
 
     // 생성자
-    public Bus(String departure, String arrival, String date, String time, int price, String seats) {
+    public Bus(String departure, String arrival, String date, String time, int price, String seats, Grade grade) {
         this.departure = departure.strip();
         this.arrival = arrival.strip();
         this.time = time.strip();
         this.price = price;
+        this.grade = grade;
         this.seats = seats.strip();
         try{
             String[] dateArray = date.split("-");
@@ -28,12 +32,13 @@ public class Bus {
         }
     }
 
-    public Bus(String departure, String arrival, LocalDate date, String time, int price) {
+    public Bus(String departure, String arrival, LocalDate date, String time, int price, Grade grade) {
         this.departure = departure;
         this.arrival = arrival;
         this.date = date;
         this.time = time;
         this.price = price;
+        this.grade = grade;
     }
 
     // isEqual 메소드 오버라이드
@@ -46,19 +51,19 @@ public class Bus {
             return false;
         }
         Bus bus = (Bus) obj;
-        return departure.equals(bus.departure) && arrival.equals(bus.arrival) && date.equals(bus.date) && time.equals(bus.time);
+        return departure.equals(bus.departure) && arrival.equals(bus.arrival) && date.equals(bus.date) && time.equals(bus.time) && grade.equals(bus.grade);
     }
 
     // hashCode 메소드 오버라이드
     @Override
     public int hashCode() {
-        return Objects.hash(departure, arrival, date, time);
+        return Objects.hash(departure, arrival, date, time, grade);
     }
 
     // toString 메소드 오버라이드
     @Override
     public String toString() {
-        return this.departure + " " + this.arrival + " " + this.getFormattedDate() + " " + this.time;
+        return this.departure + " " + this.arrival + " " + this.getFormattedDate() + " " + this.time + " " + this.grade.toString();
     }
 
     // "yyyy-mm-dd" formatted data 문자열 반환
@@ -78,26 +83,20 @@ public class Bus {
         for(int i = 0; i < seatInfo.length; i++){
             if((i+1) % 3 == 0) {
                 if(seatInfo[i].equals("1")){
-//                    ret.append("◼︎\n");
                     ret.append("\u25A0").append("\n");
                 } else {
-//                    ret.append("◻︎\n");
                     ret.append("\u25A1").append("\n");
                 }
             } else if ((i+1) % 3 == 1) {
                 if(seatInfo[i].equals("1")){
-                    //ret.append("◼︎");
                     ret.append("\u25A0");
                 } else {
-                    //ret.append("◻︎");
                     ret.append("\u25A1");
                 }
             } else {
                 if(seatInfo[i].equals("1")){
-                    //ret.append("◼︎ ");
                     ret.append("\u25A0 ");
                 } else {
-                    //ret.append("◻︎ ");
                     ret.append("\u25A1 ");
                 }
             }
@@ -113,12 +112,14 @@ public class Bus {
         ret += "일자: " + this.getFormattedDate() + "\n";
         String time2 = this.time.replace("∶",":");
         ret += "시간: " + time2 + "\n";
+        ret += "버스 등급: " +this.grade.toString() + "\n";
         ret += "가격: " + this.price + "원\n";
         ret += "좌석현황:\n";
         ret += getFormattedSeats();
         return ret;
     }
 
+    // BusManager 생성할 때 지역과 날짜로 필터링 할 때 쓰는 메소드
     public boolean checkFilter(String departure, String arrival, LocalDate date){
         return (this.arrival.equals(arrival)) && (this.departure.equals(departure)) && (this.date.isEqual(date));
     }
@@ -128,10 +129,9 @@ public class Bus {
         return (this.date.isEqual(programDate) || this.date.isAfter(programDate)) && this.date.isBefore(oneYearAfterProgramDate);
     }
 
-
     public String getBusContentForUserFile(int userSeat){
         String time2 = this.time.replace("∶",":");
-        return this.date + " / " + this.departure + " / " + this.arrival + " / 출발시간 : " + time2 + " / 보유좌석 : " + userSeat + "번 / 가격 : " + this.price + "원";
+        return this.date + " / " + this.departure + " / " + this.arrival + " / 출발시간 : " + time2 + " / 보유좌석 : " + userSeat + "번 / 가격 : " + this.price + "원 / 버스 등급 : " + this.grade.toString();
     }
 
     public boolean buySeat(int seatnum) {
@@ -198,26 +198,20 @@ public class Bus {
         for(int i = 0; i < 21; i++){
             if((i+1) % 3 == 0) {
                 if(i+1 == userBusNo){
-                    //ret.append("◼︎\n");
                     ret.append("\u25A0").append("\n");
                 } else {
-                    //ret.append("◻︎\n");
                     ret.append("\u25A1").append("\n");
                 }
             } else if ((i+1) % 3 == 1) {
                 if(i+1 == userBusNo){
-                    //ret.append("◼︎");
                     ret.append("\u25A0");
                 } else {
-                    //ret.append("◻︎");
                     ret.append("\u25A1");
                 }
             } else {
                 if(i+1 == userBusNo){
-                    //ret.append("◼︎ ");
                     ret.append("\u25A0 ");
                 } else {
-                    //ret.append("◻︎ ");
                     ret.append("\u25A1 ");
                 }
             }
@@ -232,6 +226,7 @@ public class Bus {
         ret += "일자: " + this.getFormattedDate() + "\n";
         String time2 = this.time.replace("∶",":");
         ret += "시간: " + time2 + "\n";
+        ret += "버스 등급: " +this.grade.toString() + "\n";
         ret += "가격: " + this.price + "원\n";
         ret += "좌석현황:\n";
         ret += getFormattedSeats(userBusNo);
