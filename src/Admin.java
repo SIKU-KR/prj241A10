@@ -1,5 +1,7 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -76,7 +78,8 @@ public class Admin {
 		String arrival;	// 도착지
 		String departureDayStr;	// 출발일
 		String departureTimeStr;	// 출발시각
-		String sPrice;	// 가격문자열
+		String sGrade;	// 문자열 등급
+		Grade grade = null;	// 등급
 		int price;	// 정수 가격
 
 
@@ -115,23 +118,30 @@ public class Admin {
 			departureTimeStr = scan.nextLine();
 			departureTimeFlag = checkDepartureTime(departureTimeStr);
 		} while (!departureTimeFlag);
-		// 가격 입력 받기
-		boolean priceFlag = false;
+		// 등급 입력 받기
+		boolean gradeFlag = false;
 		do {
-			System.out.print("가격을 입력하세요: ");
-			sPrice = scan.nextLine();
-			priceFlag = checkPrice(sPrice);
-		} while (!priceFlag);
-		price = Integer.parseInt(sPrice);
-
+			System.out.print("버스 등급을 입력하세요: ");
+			sGrade = scan.nextLine();
+			gradeFlag = checkGrade(sGrade);
+		} while(!gradeFlag);
+		try {
+            grade = Grade.fromString(sGrade);
+        } catch (IllegalArgumentException e) {
+            System.out.println("타입 변경에 실패하였습니다.");
+        }
+		// 등급에 해당하는 가격 대응
+		price = findPrice(departure, arrival, sGrade);
+		
 		LocalDate local = LocalDate.parse(departureDayStr);
 		BusManager bm = new BusManager(departure, arrival, local);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // 날짜 형식 지정
 		LocalDate date = LocalDate.parse(departureDayStr, formatter);
-		if(bm.hasDuplicates(new Bus(departure, arrival, date, departureTimeStr.replace(":","∶"), price))) {
+		String seats = "";
+		if(bm.hasDuplicates(new Bus(departure, arrival, departureDayStr, departureTimeStr.replace(":","∶"), price, seats, grade))) {
 			System.out.println(red+"중복으로 등록된 상품이 있습니다. 메인화면으로 돌아갑니다."+exit);
 		} else {
-			bm.addBus(departure, arrival, departureDayStr, departureTimeStr.replace(":","∶"), price);
+			bm.addBus(departure, arrival, departureDayStr, departureTimeStr.replace(":","∶"), price, grade);
 		}
 		initAdmin();
 	}
@@ -218,6 +228,50 @@ public class Admin {
 		System.out.println(red+"올바르지 않은 입력형식입니다. 다시 입력해주세요."+exit);
 		return false;
 	}
+	
+	// 등급 검사 메소드
+	boolean checkGrade(String grade) {
+		if(grade=="프리미엄" || grade=="우등" || grade=="일반")
+			return true;
+		System.out.println(red+"올바르지 않은 입력형식입니다. 다시 입력해주세요."+exit);
+		return false;
+	}
+	
+	// 등급에 해당하는 가격 반환 메소드
+	int findPrice(String departure, String arrival, String grade) {
+		String csvFile = "pricesheet.csv"; // CSV 파일의 경로
+        String line = "";
+        String cvsSplitBy = ","; // CSV 파일의 구분자
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            while ((line = br.readLine()) != null) {
+                // 한 줄씩 읽으면서 ','로 구분하여 배열에 저장
+                String[] busInfo = line.split(cvsSplitBy);
+
+                // 출발지와 도착지가 순서에 상관없이 일치하는지 확인
+                if ((busInfo[0].equals(departure) && busInfo[1].equals(arrival)) || 
+                    (busInfo[0].equals(arrival) && busInfo[1].equals(departure))) {
+                    
+                    // 등급에 따라 해당하는 가격 반환
+                    switch (grade) {
+                        case "일반":
+                            return Integer.parseInt(busInfo[2]);
+                        case "우등":
+                            return Integer.parseInt(busInfo[3]);
+                        case "프리미엄":
+                            return Integer.parseInt(busInfo[4]);
+                        default:
+                            throw new IllegalArgumentException("Unknown grade: " + grade);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 해당하는 출발지, 도착지, 등급이 없는 경우
+        throw new IllegalArgumentException("No matching route or grade found");
+	}
 
 	// 2. 상품 조회 관련 메소드
 	private void findBus() {
@@ -302,5 +356,3 @@ public class Admin {
 		logout_admin = true;
 	}
 }
-
-
