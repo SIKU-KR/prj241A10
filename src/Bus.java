@@ -151,6 +151,7 @@ public class Bus {
                 }
             }
         }
+        ret.append("\n");
         return ret.toString();
     }
 
@@ -191,6 +192,7 @@ public class Bus {
                 }
             }
         }
+        ret.append("\n");
         return ret.toString();
     }
 
@@ -286,9 +288,9 @@ public class Bus {
     private String getFormattedSeats(int userBusNo) {
         String ret = "";
         switch(this.grade){
-            case PREMIUM -> userPremiumSeats(userBusNo);
-            case DELUXE -> userDeluxeSeats(userBusNo);
-            case STANDARD -> userStandardSeats(userBusNo);
+            case PREMIUM -> ret = userPremiumSeats(userBusNo);
+            case DELUXE -> ret = userDeluxeSeats(userBusNo);
+            case STANDARD -> ret = userStandardSeats(userBusNo);
         }
         return ret;
     }
@@ -352,6 +354,7 @@ public class Bus {
                 }
             }
         }
+        ret.append("\n");
         return ret.toString();
     }
 
@@ -387,6 +390,7 @@ public class Bus {
                 }
             }
         }
+        ret.append("\n");
         return ret.toString();
     }
 
@@ -421,4 +425,29 @@ public class Bus {
         return account - price;
     }
 
+    public boolean isBefore() {
+        LocalDate programDate = LocalDate.of(mainMenuManager.year, mainMenuManager.month, mainMenuManager.day);
+        return date.isBefore(programDate);
+    }
+
+    public boolean isAfter() {
+        LocalDate programDate = LocalDate.of(mainMenuManager.year, mainMenuManager.month, mainMenuManager.day);
+        return date.isAfter(programDate);
+    }
+
+    public int discountPrice(int userPoint) {
+        double dPrice;
+
+        if(userPoint >= 15)
+            dPrice = price * 0.8;
+        else if(userPoint >= 10)
+            dPrice = price * 0.9;
+        else if(userPoint >= 5)
+            dPrice = price * 0.95;
+        else
+            dPrice = price;
+
+        dPrice = Math.round(dPrice / 100) * 100;
+        return (int)dPrice;
+    }
 }

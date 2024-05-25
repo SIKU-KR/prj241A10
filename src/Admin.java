@@ -231,7 +231,7 @@ public class Admin {
 	
 	// 등급 검사 메소드
 	boolean checkGrade(String grade) {
-		if(grade=="프리미엄" || grade=="우등" || grade=="일반")
+		if(grade.equals("프리미엄") || grade.equals("우등") || grade.equals("일반"))
 			return true;
 		System.out.println(red+"올바르지 않은 입력형식입니다. 다시 입력해주세요."+exit);
 		return false;

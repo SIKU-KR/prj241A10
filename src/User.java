@@ -69,14 +69,15 @@ public class User {
 			// 사용자 운행 상품을 읽어와서 ArrayList에 추가
 			while ((line = br.readLine()) != null) {
 				String[] busInfo = line.split("/");
-				// ex) 2024-03-25 / 서울 / 대구 / 출발시간 : 11:00 / 보유좌석 : 13번 / 가격 : 5000원
-				if (busInfo.length == 6) {
+				// ex) 2024-03-25 / 서울 / 대구 / 출발시간 : 11:00 / 보유좌석 : 13번 / 가격 : 5000원 / 버스 등급 : 일반
+				if (busInfo.length == 7) {
 					String date = busInfo[0].trim();
 					String departure = busInfo[1].trim();
 					String arrival = busInfo[2].trim();
 					String time = busInfo[3].trim();
 					String userSeatStr = busInfo[4].trim();
 					String priceStr = busInfo[5].trim();
+					String sGrade = busInfo[6].trim();
 					time = time.replace("출발시간 : ", "");
 					time = time.replace(":","∶");
 					userSeatStr = userSeatStr.replace("보유좌석 : ", "");
@@ -84,11 +85,21 @@ public class User {
 					int userSeat = Integer.parseInt(userSeatStr);
 					userSeatArrayList.add(userSeat);
 					int price = Integer.parseInt(priceStr.replace("가격 : ", "").replace("원", ""));
+					sGrade = sGrade.replace("버스 등급 : ", "");
+					//System.out.println("테스트 : " + sGrade + "\n");
 					String seats;
 					//BufferedReader busReader = new BufferedReader((new FileReader("bus/" + departure + " " + arrival + " " + date + " " + time + ".txt")));
-					BufferedReader busReader = new BufferedReader(new InputStreamReader(new FileInputStream("bus/" + departure + " " + arrival + " " + date + " " + time + ".txt"), StandardCharsets.UTF_8));
+					BufferedReader busReader = new BufferedReader(new InputStreamReader(new FileInputStream("bus/" + departure + " " + arrival + " " + date + " " + time + " " + sGrade + ".txt"), StandardCharsets.UTF_8));
 					seats = busReader.readLine().split(",")[1];
-					busArrayList.add(new Bus(departure, arrival, date, time, price, seats));
+
+					Grade grade = null;
+					try {
+						grade = Grade.fromString(sGrade);
+					} catch (IllegalArgumentException e) {
+						System.out.println("타입 변경에 실패하였습니다.");
+					}
+					busArrayList.add(new Bus(departure, arrival, date, time, price, seats, grade));
+					//busArrayList.add(new Bus(departure, arrival, date, time, price, seats));
 				} else {
 					System.err.println("올바르지 않은 형식의 데이터입니다: " + line);
 				}
