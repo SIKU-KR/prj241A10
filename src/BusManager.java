@@ -89,8 +89,13 @@ public class BusManager {
     // 버스 객체 텍스트 파일 추가 메소드
     public void addBus(String departure, String arrival, String date, String time, int price, Grade grade){
         String windowTime = time.replace(":","∶");
-        String filename = departure + " " + arrival + " " + date + " " + windowTime + ".txt";
-        String newBusSeats = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
+        String filename = departure + " " + arrival + " " + date + " " + windowTime + " " + grade.toString() + ".txt";
+        //String newBusSeats = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
+        String newBusSeats = switch (grade.toString()) {
+            case "일반" -> "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
+            case "우등" -> "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
+            default -> "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
+        };
         String content = price + "," + newBusSeats;
         // 파일에 내용 작성
         //try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.directory + "/" + filename))) {

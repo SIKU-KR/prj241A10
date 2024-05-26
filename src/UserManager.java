@@ -1,6 +1,7 @@
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,7 +78,6 @@ public class UserManager {
 		//지역사전 가져오기
 		List<String> locationList = new ArrayList<>();
 		locationFile(locationList);
-
 
 		//등록된 운행 상품 조회
 		System.out.println("운행 상품 조회 모드입니다.");
@@ -333,9 +333,18 @@ public class UserManager {
 				String departure = titleName[0];
 				String destination = titleName[1];
 				String date = titleName[2];
-				String time = titleName[3].replace(".txt", "");
+				String time = titleName[3];
+				String sGrade = titleName[4].replace(".txt", "");
 
-				return new Bus(departure,destination,date,time,price,seats);
+
+				Grade grade = null;
+				try {
+					grade = Grade.fromString(sGrade);
+				} catch (IllegalArgumentException e) {
+					System.out.println("타입 변경에 실패하였습니다.");
+				}
+				return new Bus(departure,destination,date,time,price,seats,grade);
+				//return new Bus(departure,destination,date,time,price,seats);
 			}
 		}catch (FileNotFoundException e){
 			System.err.println(e.getMessage());
@@ -365,7 +374,10 @@ public class UserManager {
 					throw new NumberFormatException(red+"올바르지 않은 입력형식입니다. 다시 입력해주세요."+exit);
 				}
 				seatNum=Integer.parseInt(inputSeat);
-				if(seatNum<1 || seatNum >21){
+
+
+
+				if(seatNum<1 || seatNum > seats.length) {
 					System.out.println(red+"없는 좌석입니다. 다시 입력해주세요."+exit);
 					continue;
 				}
@@ -395,9 +407,30 @@ public class UserManager {
 		Scanner sc = new Scanner(System.in);
 		int choiceNum;
 
+		ArrayList <Bus> userBus = user.getBusArrayList();
+		LocalDate programDate = LocalDate.of(mainMenuManager.year, mainMenuManager.month, mainMenuManager.day);
+		System.out.println("사용자가 구매한 총 운행상품 수 : " + userBus.size());
+
+		int userPoint = 0;
+		for(Bus tBus : userBus) {
+			if(tBus.isBefore())
+				userPoint++;
+		}
+		System.out.println("사용자가 구매'확정'한 총 운행상품 수 : " + userPoint);
+		String discount = "0%";
+		if(userPoint >= 15)
+			discount = "20%";
+		else if(userPoint >= 10)
+			discount = "10%";
+		else if(userPoint >= 5)
+			discount = "5%";
+
 		System.out.println("현재 잔액 ["+user.getUserAccount()+"]원");
 		System.out.println("--------------------------------------------------------------");
-		System.out.println("결제하실 가격은 "+bus.printPrice()+"입니다.");
+		//System.out.println("결제하실 가격은 "+bus.printPrice()+"입니다.");
+		System.out.println("운행상품의 가격은 "+bus.printPrice()+"원 입니다.");
+		System.out.println(user.getUserName() + "님이 이용하신 운행 상품은 "+userPoint+"개이므로 "+discount+"의 할인이 적용됩니다.");
+		System.out.println("최종 결제 가격은 "+bus.discountPrice(userPoint)+"원 입니다.");
 		System.out.println("1: 결제하기");
 		System.out.println("2: 충전하기");
 		System.out.println("3: 티켓 상세조회로 돌아가기");
@@ -527,7 +560,13 @@ public class UserManager {
 		}while(userDetailSearchAndCancelCheck(userInput));
 
 		if(userInput.equals("y")) {
-			userCancel(userBusNo, user);
+			if(!userBus.isAfter()) {
+				System.out.println(user.getUserName()+"님");
+				System.out.println(userBusNo+"번 운행 상품의 취소 가능 날짜를 지났으므로 취소하실 수 없습니다.");
+				initUserManager(user);
+			}
+			else
+				userCancel(userBusNo, user);
 		} else if(userInput.equals("n")) {
 			initUserManager(user);
 		}
