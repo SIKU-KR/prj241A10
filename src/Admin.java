@@ -4,6 +4,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -140,10 +144,25 @@ public class Admin {
 		String seats = "";
 		if(bm.hasDuplicates(new Bus(departure, arrival, departureDayStr, departureTimeStr.replace(":","∶"), price, seats, grade))) {
 			System.out.println(red+"중복으로 등록된 상품이 있습니다. 메인화면으로 돌아갑니다."+exit);
+			initAdmin();
 		} else {
-			bm.addBus(departure, arrival, departureDayStr, departureTimeStr.replace(":","∶"), price, grade);
+			try {
+				int bus_cnt = countFilesInDirectory();
+				System.out.println("bus 디렉토리 내의 파일 개수: " + bus_cnt);
+				if(bus_cnt>=50){
+					System.out.println("등록할 수 있는 상품의 개수를 초과했습니다. 최대 등록 가능 상품은 50개입니다.");
+					System.out.println("관리자 메뉴로 이동합니다.");
+					initAdmin();
+				}else {
+					bm.addBus(departure, arrival, departureDayStr, departureTimeStr.replace(":","∶"), price, grade);
+					initAdmin();
+				}
+			} catch (IOException e) {
+				System.err.println("파일을 세는 동안 오류가 발생했습니다: " + e.getMessage());
+			} catch (IllegalArgumentException e) {
+				System.err.println(e.getMessage());
+			}
 		}
-		initAdmin();
 	}
 
 	// 지역 사전 출력 메소드
@@ -355,4 +374,27 @@ public class Admin {
 //		m.showmenu();
 		logout_admin = true;
 	}
+
+	// 파일 개수 카운트 메소드
+	public static int countFilesInDirectory() throws IOException {
+		Path path = Paths.get("bus");
+		if (!Files.isDirectory(path)) {
+			throw new IllegalArgumentException("올바른 디렉토리가 아닙니다.");
+		}
+
+		int fileCount = 0;
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+			for (Path entry : stream) {
+				if (Files.isRegularFile(entry)) {
+					fileCount++;
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("디렉토리 스트림을 여는 동안 오류가 발생했습니다: " + e.getMessage());
+			throw e;
+		}
+
+		return fileCount;
+	}
+
 }
