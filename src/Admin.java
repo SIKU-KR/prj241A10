@@ -148,7 +148,7 @@ public class Admin {
 		} else {
 			try {
 				int bus_cnt = countFilesInDirectory();
-				System.out.println("bus 디렉토리 내의 파일 개수: " + bus_cnt);
+				// System.out.println("bus 디렉토리 내의 파일 개수: " + bus_cnt);
 				if(bus_cnt>=50){
 					System.out.println("등록할 수 있는 상품의 개수를 초과했습니다. 최대 등록 가능 상품은 50개입니다.");
 					System.out.println("관리자 메뉴로 이동합니다.");
