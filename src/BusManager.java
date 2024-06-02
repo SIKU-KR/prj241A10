@@ -5,8 +5,6 @@ import java.util.ArrayList;
 
 // TODO !! grade 추가하여서 모든 로직 수정하기!!!!!!!
 public class BusManager {
-    // 2차 추가 구현 변수들
-    private final ArrayList<BusPriceInfo> pricelist;
 
     // 멤버 변수
     private final ArrayList<Bus> busArrayList;	// 버스 목록
@@ -24,10 +22,8 @@ public class BusManager {
     // 생성자, 출발지, 도착지, 출발일에 부합하는 파일만 읽어옴
     public BusManager(String departure, String arrival, LocalDate date) {
         this.busArrayList = new ArrayList<>();
-        this.pricelist = new ArrayList<>();
         getBusFromFileSystem();
         filterBy(departure, arrival, date);
-        readPrice();
     }
 
     // 메소드
@@ -113,26 +109,5 @@ public class BusManager {
 
     public void printBusSpecific(int idx){
         System.out.println(this.busArrayList.get(idx-1).getDetailInfo());
-    }
-
-    private void readPrice() {
-        String filePath = "./pricesheet.csv";
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 5) {
-                    String place1 = parts[0];
-                    String place2 = parts[1];
-                    int price1 = Integer.parseInt(parts[2]);
-                    int price2 = Integer.parseInt(parts[3]);
-                    int price3 = Integer.parseInt(parts[4]);
-                    BusPriceInfo busPriceInfo = new BusPriceInfo(place1, place2, price1, price2, price3);
-                    this.pricelist.add(busPriceInfo);
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("fuck");
-        }
     }
 }
