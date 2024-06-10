@@ -432,14 +432,14 @@ public class UserManager {
 
 		ArrayList <Bus> userBus = user.getBusArrayList();
 		LocalDate programDate = LocalDate.of(mainMenuManager.year, mainMenuManager.month, mainMenuManager.day);
-		System.out.println("사용자가 구매한 총 운행상품 수 : " + userBus.size());
+		//System.out.println("사용자가 구매한 총 운행상품 수 : " + userBus.size());
 
 		int userPoint = 0;
 		for(Bus tBus : userBus) {
 			if(tBus.isBefore())
 				userPoint++;
 		}
-		System.out.println("사용자가 구매'확정'한 총 운행상품 수 : " + userPoint);
+		//System.out.println("사용자가 구매'확정'한 총 운행상품 수 : " + userPoint);
 		String discount = "0%";
 		if(userPoint >= 15)
 			discount = "20%";
