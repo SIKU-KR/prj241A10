@@ -2,6 +2,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -102,6 +103,7 @@ public class UserManager {
 				compareLocations(departure,destination);
 				findlocationInfile(departure,destination,locationList);
 
+
 				System.out.print("원하시는 날짜를 입력해주세요(yyyy-mm-dd): ");
 				date=sc.nextLine();
 				if (!validateDate(date)){
@@ -110,6 +112,12 @@ public class UserManager {
 				}
 				if(!checkCalender((date))){
 					System.out.println(red+"올바르지 않은 입력형식입니다. 다시 입력해주세요."+exit);
+					continue;
+				}
+				if(!isWithinOneYear(date).equals("")) {
+
+					System.out.println(red+"날짜 범위를 벗어났습니다. 다시 입력해주세요. "+isWithinOneYear(date)+" 까지 입력가능합니다."+exit);
+					//날짜 범위를 벗어났습니다. 다시 입력해주세요. 2024-01-01 까지 입력가능합니다.
 					continue;
 				}
 
@@ -219,6 +227,21 @@ public class UserManager {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+
+	String isWithinOneYear(String date) {
+
+		LocalDate baseDate = LocalDate.of(mainMenuManager.year, mainMenuManager.month, mainMenuManager.day);
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate inputDate = LocalDate.parse(date, formatter);
+
+		LocalDate oneYearAfterBaseDate = baseDate.plusYears(1);
+
+		if(!inputDate.isBefore(baseDate) && !inputDate.isAfter(oneYearAfterBaseDate))
+			return "";
+		else
+			return oneYearAfterBaseDate.format(formatter);
 	}
 
 	//1.2 검색한 운생상품 조회
