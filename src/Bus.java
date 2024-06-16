@@ -99,15 +99,15 @@ public class Bus {
                 }
             } else if ((i+1) % 3 == 1) {
                 if(seatInfo[i].equals("1")){
-                    ret.append("\u25A0");
-                } else {
-                    ret.append("\u25A1");
-                }
-            } else {
-                if(seatInfo[i].equals("1")){
                     ret.append("\u25A0 ");
                 } else {
                     ret.append("\u25A1 ");
+                }
+            } else {
+                if(seatInfo[i].equals("1")){
+                    ret.append("\u25A0   ");
+                } else {
+                    ret.append("\u25A1   ");
                 }
             }
         }
@@ -139,15 +139,15 @@ public class Bus {
                 }
             } else if ((i+1) % 3 == 1) {
                 if(seatInfo[i].equals("1")){
-                    ret.append("\u25A0");
-                } else {
-                    ret.append("\u25A1");
-                }
-            } else {
-                if(seatInfo[i].equals("1")){
                     ret.append("\u25A0 ");
                 } else {
                     ret.append("\u25A1 ");
+                }
+            } else {
+                if(seatInfo[i].equals("1")){
+                    ret.append("\u25A0   ");
+                } else {
+                    ret.append("\u25A1   ");
                 }
             }
         }
@@ -180,9 +180,15 @@ public class Bus {
                 }
             } else if ((i+1) % 4 == 1) {
                 if(seatInfo[i].equals("1")){
-                    ret.append("\u25A0");
+                    ret.append("\u25A0 ");
                 } else {
-                    ret.append("\u25A1");
+                    ret.append("\u25A1 ");
+                }
+            } else if ((i+1) % 4 == 2) {
+                if(seatInfo[i].equals("1")){
+                    ret.append("\u25A0   ");
+                } else {
+                    ret.append("\u25A1   ");
                 }
             } else {
                 if(seatInfo[i].equals("1")){
@@ -307,15 +313,15 @@ public class Bus {
                 }
             } else if ((i+1) % 3 == 1) {
                 if(i+1 == userBusNo){
-                    ret.append("\u25A0");
-                } else {
-                    ret.append("\u25A1");
-                }
-            } else {
-                if(i+1 == userBusNo){
                     ret.append("\u25A0 ");
                 } else {
                     ret.append("\u25A1 ");
+                }
+            } else {
+                if(i+1 == userBusNo){
+                    ret.append("\u25A0   ");
+                } else {
+                    ret.append("\u25A1   ");
                 }
             }
         }
@@ -342,15 +348,15 @@ public class Bus {
                 }
             } else if ((i+1) % 3 == 1) {
                 if(i+1 == userBusNo){
-                    ret.append("\u25A0");
-                } else {
-                    ret.append("\u25A1");
-                }
-            } else {
-                if(i+1 == userBusNo){
                     ret.append("\u25A0 ");
                 } else {
                     ret.append("\u25A1 ");
+                }
+            } else {
+                if(i+1 == userBusNo){
+                    ret.append("\u25A0   ");
+                } else {
+                    ret.append("\u25A1   ");
                 }
             }
         }
@@ -378,9 +384,15 @@ public class Bus {
                 }
             } else if ((i+1) % 4 == 1) {
                 if(i+1 == userBusNo){
-                    ret.append("\u25A0");
+                    ret.append("\u25A0 ");
                 } else {
-                    ret.append("\u25A1");
+                    ret.append("\u25A1 ");
+                }
+            } else if ((i+1) % 4 == 2) {
+                if(i+1 == userBusNo){
+                    ret.append("\u25A0   ");
+                } else {
+                    ret.append("\u25A1   ");
                 }
             } else {
                 if(i+1 == userBusNo){
