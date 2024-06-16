@@ -1,9 +1,5 @@
 // 주석
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -260,38 +256,36 @@ public class Admin {
 	// 등급에 해당하는 가격 반환 메소드
 	int findPrice(String departure, String arrival, String grade) {
 		String csvFile = "pricesheet.csv"; // CSV 파일의 경로
-        String line = "";
-        String cvsSplitBy = ","; // CSV 파일의 구분자
+		String line = "";
+		String cvsSplitBy = ","; // CSV 파일의 구분자
 
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-            while ((line = br.readLine()) != null) {
-                // 한 줄씩 읽으면서 ','로 구분하여 배열에 저장
-                String[] busInfo = line.split(cvsSplitBy);
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(csvFile), "UTF-8"))) {
+			while ((line = br.readLine()) != null) {
+				// 한 줄씩 읽으면서 ','로 구분하여 배열에 저장
+				String[] busInfo = line.split(cvsSplitBy);
 
-                // 출발지와 도착지가 순서에 상관없이 일치하는지 확인
-                if ((busInfo[0].equals(departure) && busInfo[1].equals(arrival)) || 
-                    (busInfo[0].equals(arrival) && busInfo[1].equals(departure))) {
-                    
-                    // 등급에 따라 해당하는 가격 반환
-                    switch (grade) {
-                        case "일반":
-                            return Integer.parseInt(busInfo[2]);
-                        case "우등":
-                            return Integer.parseInt(busInfo[3]);
-                        case "프리미엄":
-                            return Integer.parseInt(busInfo[4]);
-                        default:
-                            throw new IllegalArgumentException("Unknown grade: " + grade);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // 해당하는 출발지, 도착지, 등급이 없는 경우
-        throw new IllegalArgumentException("No matching route or grade found");
+				// 출발지와 도착지가 순서에 상관없이 일치하는지 확인
+				if ((busInfo[0].equals(departure) && busInfo[1].equals(arrival)) ||
+						(busInfo[0].equals(arrival) && busInfo[1].equals(departure))) {
+					// 등급에 따라 해당하는 가격 반환
+					switch (grade) {
+						case "일반":
+							return Integer.parseInt(busInfo[2]);
+						case "우등":
+							return Integer.parseInt(busInfo[3]);
+						case "프리미엄":
+							return Integer.parseInt(busInfo[4]);
+						default:
+							throw new IllegalArgumentException("Unknown grade: " + grade);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
+
 
 	// 2. 상품 조회 관련 메소드
 	private void findBus() {
